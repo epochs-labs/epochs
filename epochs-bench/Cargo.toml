@@ -1,0 +1,21 @@
+[package]
+name = "epochs-bench"
+description = "Versioned KV / commit-DAG benchmarks: epochs vs SQL (SQLite, Postgres, MySQL)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "epochs-bench"
+path = "src/main.rs"
+
+[dependencies]
+epochs-core = { path = "../epochs-core", version = "0.1.0" }
+clap.workspace = true
+rusqlite = { version = "0.32", features = ["bundled"] }
+postgres = "0.19"
+mysql = "25"

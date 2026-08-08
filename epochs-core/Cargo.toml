@@ -1,0 +1,23 @@
+[package]
+name = "epochs-core"
+description = "Minimal-dependency version-controlled Merkle-DAG engine (std + blake3)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+authors.workspace = true
+keywords = ["database", "merkle", "dag", "hamt", "git"]
+categories = ["database-implementations", "data-structures"]
+
+[features]
+default = ["mmap", "parallel-hash"]
+## Memory-map cold CAS segments for faster random reads.
+mmap = ["dep:memmap2"]
+## Use BLAKE3's rayon-backed hasher for large payloads.
+parallel-hash = ["blake3/rayon"]
+
+[dependencies]
+blake3 = { version = "1", default-features = true }
+memmap2 = { version = "0.9", optional = true }

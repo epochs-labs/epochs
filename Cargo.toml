@@ -1,0 +1,22 @@
+[workspace]
+members = ["epochs-core", "epochql", "epochs-cli", "epochs-bench"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/epochs-labs/epochs"
+homepage = "https://github.com/epochs-labs/epochs"
+readme = "README.md"
+authors = ["Epochs Labs contributors"]
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+bincode = "1"
+thiserror = "2"
+blake3 = "1"
+dashmap = "6"
+arc-swap = "1"
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }

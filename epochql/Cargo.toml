@@ -1,0 +1,15 @@
+[package]
+name = "epochql"
+description = "EpochQL — query language for version-controlled Merkle-DAG state"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+authors.workspace = true
+keywords = ["query-language", "database", "merkle", "dag"]
+categories = ["database-implementations", "parser-implementations"]
+
+[dependencies]
+epochs-core = { path = "../epochs-core", version = "0.1.0" }

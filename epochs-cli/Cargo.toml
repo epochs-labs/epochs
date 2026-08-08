@@ -1,0 +1,21 @@
+[package]
+name = "epochs-cli"
+description = "Developer CLI for the epochs version-controlled DAG database"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+authors.workspace = true
+keywords = ["cli", "database", "merkle", "dag"]
+categories = ["command-line-utilities", "database-implementations"]
+
+[[bin]]
+name = "epochs"
+path = "src/main.rs"
+
+[dependencies]
+epochs-core = { path = "../epochs-core", version = "0.1.0" }
+epochql = { path = "../epochql", version = "0.1.0" }
+clap.workspace = true

@@ -1,0 +1,9 @@
+# Build context is the repo root (see docker-compose.yml).
+target/
+**/target/
+.git/
+.epochs/
+**/.epochs/
+benches/out/
+**/.DS_Store
+.cursor/

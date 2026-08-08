@@ -1,0 +1,83 @@
+# Fair reproducible bench: every engine gets the SAME cgroup budget.
+#
+#   2 CPUs + 2 GiB RAM per system-under-test
+#
+# epochs / sqlite: bench process alone
+# postgres / mysql: DB server + bench client share that one budget
+#
+# Run sequentially (do not up -d all at once — they would contend on the host):
+#
+#   ./benches/run.sh smoke
+#
+# Build context is the repo root.
+
+x-limits: &limits
+  cpus: "2.0"
+  mem_limit: 2g
+
+x-results: &results
+  - ./out:/results
+
+services:
+  epochs:
+    build:
+      context: ..
+      dockerfile: benches/Dockerfile
+      target: embedded
+    image: epochs-bench:embedded
+    <<: *limits
+    environment:
+      ENGINE: epochs
+      TIER: ${TIER:-smoke}
+      SHAPE: ${SHAPE:-deep}
+      PROGRESS_EVERY: ${PROGRESS_EVERY:-1000}
+      RESULTS_CSV: /results/results.csv
+      EXTRA_ARGS: ${EXTRA_ARGS:-}
+    volumes: *results
+
+  sqlite:
+    build:
+      context: ..
+      dockerfile: benches/Dockerfile
+      target: embedded
+    image: epochs-bench:embedded
+    <<: *limits
+    environment:
+      ENGINE: sqlite
+      TIER: ${TIER:-smoke}
+      SHAPE: ${SHAPE:-deep}
+      PROGRESS_EVERY: ${PROGRESS_EVERY:-1000}
+      RESULTS_CSV: /results/results.csv
+      EXTRA_ARGS: ${EXTRA_ARGS:-}
+    volumes: *results
+
+  postgres:
+    build:
+      context: ..
+      dockerfile: benches/Dockerfile
+      target: postgres
+    image: epochs-bench:postgres
+    <<: *limits
+    environment:
+      TIER: ${TIER:-smoke}
+      SHAPE: ${SHAPE:-deep}
+      PROGRESS_EVERY: ${PROGRESS_EVERY:-1000}
+      RESULTS_CSV: /results/results.csv
+      EXTRA_ARGS: ${EXTRA_ARGS:-}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes: *results
+
+  mysql:
+    build:
+      context: ..
+      dockerfile: benches/Dockerfile
+      target: mysql
+    image: epochs-bench:mysql
+    <<: *limits
+    environment:
+      TIER: ${TIER:-smoke}
+      SHAPE: ${SHAPE:-deep}
+      PROGRESS_EVERY: ${PROGRESS_EVERY:-1000}
+      RESULTS_CSV: /results/results.csv
+      EXTRA_ARGS: ${EXTRA_ARGS:-}
+    volumes: *results
