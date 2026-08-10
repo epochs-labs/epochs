@@ -131,48 +131,8 @@ jobs:
         if: always() && github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ ! -f coverage.json ]; then
-            echo "No coverage.json; skip comment"
-            exit 0
-          fi
-          PCT=$(python3 -c 'import json; print(json.load(open("coverage.json"))["line_percent"])')
-          FLOOR=$(python3 -c '
-from pathlib import Path
-for line in Path(".github/coverage-floor").read_text().splitlines():
-    s=line.strip()
-    if s and not s.startswith("#"):
-        print(s.split()[0]); break
-')
-          if [ -f baseline/coverage.json ]; then
-            BASE=$(python3 -c 'import json; print(json.load(open("baseline/coverage.json"))["line_percent"])')
-            DELTA=$(python3 -c "print(round($PCT - $BASE, 2))")
-            BASE_LINE="| vs \`main\` | ${BASE}% → **${PCT}%** (Δ ${DELTA}pp) |"
-          else
-            BASE_LINE="| vs \`main\` | _(no baseline artifact yet — next main push establishes one)_ |"
-          fi
-          BODY=$(cat <<EOF
-          <!-- epochs-coverage -->
-          ## Coverage report
-
-          | | |
-          |--|--|
-          | **Line coverage** | **${PCT}%** |
-          | Floor | ${FLOOR}% |
-          ${BASE_LINE}
-
-          Source: \`cargo llvm-cov\` (LLVM instrumentation). Full table is in the **coverage** job summary.
-          EOF
-          )
-          BODY=$(printf '%s\n' "$BODY" | sed 's/^          //')
-          MARKER="<!-- epochs-coverage -->"
-          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            --jq ".[] | select(.body | contains(\"$MARKER\")) | .id" | head -n 1)
-          if [ -n "$COMMENT_ID" ]; then
-            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}" -f body="$BODY"
-          else
-            gh pr comment "${{ github.event.pull_request.number }}" --body "$BODY"
-          fi
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 .github/scripts/coverage_pr_comment.py
 
       - name: Upload coverage artifacts
         if: always()
