@@ -137,7 +137,13 @@ jobs:
             exit 0
           fi
           PCT=$(python3 -c 'import json; print(json.load(open("coverage.json"))["line_percent"])')
-          FLOOR=$(awk 'NF{print $1; exit}' .github/coverage-floor)
+          FLOOR=$(python3 -c '
+from pathlib import Path
+for line in Path(".github/coverage-floor").read_text().splitlines():
+    s=line.strip()
+    if s and not s.startswith("#"):
+        print(s.split()[0]); break
+')
           if [ -f baseline/coverage.json ]; then
             BASE=$(python3 -c 'import json; print(json.load(open("baseline/coverage.json"))["line_percent"])')
             DELTA=$(python3 -c "print(round($PCT - $BASE, 2))")
