@@ -1,0 +1,39 @@
+# Codecov — coverage on PRs and merge protection
+#
+# Free for public OSS. Install the Codecov GitHub App on epochs-labs/epochs
+# and (recommended) set repo secret CODECOV_TOKEN so uploads from forks are reliable.
+# Docs: https://docs.codecov.com/docs/quick-start
+
+coverage:
+  status:
+    # Whole-repo: fail if coverage falls vs base (auto baseline).
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        if_ci_failed: error
+    # Lines touched by the PR: require solid coverage on new/changed code.
+    patch:
+      default:
+        target: 70%
+        threshold: 0%
+        if_ci_failed: error
+
+comment:
+  layout: "condensed_header, condensed_files, condensed_footer"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+ignore:
+  - "epochs-bench/**"
+  - "benches/**"
+  - "**/tests/**"
+  - "target/**"
+  # Thin process entrypoints covered via integration tests / manual runs.
+  - "epochs-cli/src/main.rs"
+  - "epochs-server/src/main.rs"
+
+github_checks:
+  annotations: true

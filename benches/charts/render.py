@@ -84,9 +84,10 @@ def svg_grouped_bars(
     height: int = 440,
 ) -> str:
     """groups = x labels (e.g. commit counts); series[engine] = values aligned to groups."""
-    pad_l, pad_r, pad_t, pad_b = 80, 24, 52, 72
+    pad_l, pad_r, pad_t, pad_b = 80, 24, 52, 88
     plot_w = width - pad_l - pad_r
     plot_h = height - pad_t - pad_b
+    min_bar_h = 6.0  # always draw a stub so the lowest series stays visible
 
     engines = [e for e in ENGINES if e in series and any(v > 0 for v in series[e])]
     if not groups or not engines:
@@ -96,13 +97,15 @@ def svg_grouped_bars(
         )
 
     vals = [v for e in engines for v in series[e] if v > 0]
-    ymin = min(vals) if log_y else 0.0
-    ymax = max(vals)
+    vmax = max(vals)
     if log_y:
-        ymin = max(ymin, 1e-9)
-        ymax = max(ymax, ymin * 10)
+        # Floor below the smallest sample so the min value is not mapped to y=0
+        # (that made epochs bars disappear on latency / R2 charts).
+        ymin = max(min(vals) / 10.0, 1e-9)
+        ymax = max(vmax * 1.2, ymin * 10)
     else:
-        ymax = ymax * 1.15 if ymax > 0 else 1.0
+        ymin = 0.0
+        ymax = vmax * 1.15 if vmax > 0 else 1.0
 
     def ymap(y: float) -> float:
         if log_y:
@@ -119,6 +122,7 @@ def svg_grouped_bars(
     gap = cluster * 0.18
     usable = cluster - gap
     bar_w = usable / n_eng
+    label_fmt = value_fmt or nice_num
 
     font = "IBM Plex Sans, Helvetica, Arial, sans-serif"
     parts = [
@@ -141,7 +145,7 @@ def svg_grouped_bars(
         parts.append(
             f'<line x1="{pad_l}" y1="{y:.1f}" x2="{pad_l + plot_w}" y2="{y:.1f}" stroke="#eee"/>'
         )
-        label = value_fmt(gy) if value_fmt else nice_num(gy)
+        label = label_fmt(gy)
         parts.append(
             f'<text x="{pad_l - 8}" y="{y + 4:.1f}" text-anchor="end" font-family="{font}" '
             f'font-size="11" fill="#666">{label}</text>'
@@ -155,12 +159,26 @@ def svg_grouped_bars(
             if v <= 0:
                 continue
             x = cx + ei * bar_w
+            bw = max(bar_w - 2, 1)
             y = ymap(v)
-            h = baseline - y
+            h = max(baseline - y, min_bar_h)
+            y = baseline - h
             color = COLORS.get(eng, "#333")
             parts.append(
-                f'<rect x="{x:.1f}" y="{y:.1f}" width="{max(bar_w - 2, 1):.1f}" height="{h:.1f}" '
+                f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{h:.1f}" '
                 f'fill="{color}" rx="2"/>'
+            )
+            # Value on / above the bar so tiny winners (epochs) stay readable.
+            lbl = label_fmt(v)
+            if h >= 22:
+                ty = y + 14
+                fill = "#fff"
+            else:
+                ty = y - 4
+                fill = "#1a1a1a"
+            parts.append(
+                f'<text x="{x + bw / 2:.1f}" y="{ty:.1f}" text-anchor="middle" '
+                f'font-family="{font}" font-size="10" font-weight="600" fill="{fill}">{lbl}</text>'
             )
         parts.append(
             f'<text x="{cx + usable / 2:.1f}" y="{baseline + 22}" text-anchor="middle" '

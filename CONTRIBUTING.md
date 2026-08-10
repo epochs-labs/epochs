@@ -17,9 +17,30 @@ cargo test --workspace
 3. Keep diffs focused. Prefer small PRs over large refactors.
 4. **Tests required** for new or changed behavior (`cargo test --workspace`
    must cover it — unit and/or integration). Do not land features without tests.
-5. Do not commit secrets, local `target/`, or `benches/out/` scratch files.
+5. Pull requests use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
+   CI runs fmt/clippy/tests **and** coverage (`cargo llvm-cov` → Codecov). Merging
+   should not lower project coverage materially; new lines should be covered
+   (see [`codecov.yml`](codecov.yml)).
+6. Do not commit secrets, local `target/`, or `benches/out/` scratch files.
    Published bench charts/CSV under `benches/charts/` and `benches/RESULTS.md`
    are fine when regenerating intentionally.
+
+### Coverage locally
+
+```bash
+cargo install cargo-llvm-cov
+rustup component add llvm-tools-preview
+cargo llvm-cov --workspace --exclude epochs-bench --html --open
+```
+
+### GitHub / Codecov setup (maintainers)
+
+1. Install the [Codecov GitHub App](https://github.com/apps/codecov) on `epochs-labs`.
+2. (Recommended) Add repo secret `CODECOV_TOKEN` from the Codecov project settings
+   so PR uploads from forks are reliable.
+3. In branch protection for `main`, require checks:
+   - `fmt · clippy · test`
+   - Codecov / `coverage` statuses once they appear on a PR
 
 ## Scope
 

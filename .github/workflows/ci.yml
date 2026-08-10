@@ -32,3 +32,70 @@ jobs:
 
       - name: cargo test
         run: cargo test --workspace
+
+  coverage:
+    name: coverage
+    runs-on: ubuntu-latest
+    # Codecov PR comments / checks need this on the base workflow.
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: coverage
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Generate coverage
+        run: |
+          cargo llvm-cov --workspace --locked \
+            --exclude epochs-bench \
+            --codecov --output-path codecov.json
+          cargo llvm-cov report --summary-only | tee coverage-summary.txt
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Test coverage"
+            echo
+            if [ -f coverage-summary.txt ]; then
+              echo '```'
+              cat coverage-summary.txt
+              echo '```'
+            else
+              echo "_Coverage summary unavailable (see job logs)._"
+            fi
+            echo
+            echo "Full report uploads to [Codecov](https://app.codecov.io/gh/epochs-labs/epochs)."
+            echo "Project/patch status is enforced via \`codecov.yml\` (fail on material drop)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Codecov report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codecov-json
+          path: codecov.json
+          if-no-files-found: ignore
+
+      - name: Upload to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: codecov.json
+          # Prefer secret when set; public repos can also use the Codecov GitHub App.
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          verbose: true

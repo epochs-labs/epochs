@@ -1,33 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="860" height="440" viewBox="0 0 860 440">
 <rect width="100%" height="100%" fill="#FAFAF8"/>
 <text x="80" y="30" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1a1a1a">Memory (cgroup RSS)</text>
-<text x="18" y="210.0" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#555" transform="rotate(-90 18,210.0)">bytes</text>
-<rect x="80" y="52" width="756" height="316" fill="#fff" stroke="#e5e5e5"/>
-<line x1="80" y1="368.0" x2="836" y2="368.0" stroke="#eee"/>
-<text x="72" y="372.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">15.8M</text>
-<line x1="80" y1="289.0" x2="836" y2="289.0" stroke="#eee"/>
-<text x="72" y="293.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">54.0M</text>
-<line x1="80" y1="210.0" x2="836" y2="210.0" stroke="#eee"/>
-<text x="72" y="214.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">184.3M</text>
-<line x1="80" y1="131.0" x2="836" y2="131.0" stroke="#eee"/>
-<text x="72" y="135.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">629.1M</text>
+<text x="18" y="202.0" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#555" transform="rotate(-90 18,202.0)">bytes</text>
+<rect x="80" y="52" width="756" height="300" fill="#fff" stroke="#e5e5e5"/>
+<line x1="80" y1="352.0" x2="836" y2="352.0" stroke="#eee"/>
+<text x="72" y="356.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">1.6M</text>
+<line x1="80" y1="277.0" x2="836" y2="277.0" stroke="#eee"/>
+<text x="72" y="281.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">10.0M</text>
+<line x1="80" y1="202.0" x2="836" y2="202.0" stroke="#eee"/>
+<text x="72" y="206.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">63.8M</text>
+<line x1="80" y1="127.0" x2="836" y2="127.0" stroke="#eee"/>
+<text x="72" y="131.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">405.6M</text>
 <line x1="80" y1="52.0" x2="836" y2="52.0" stroke="#eee"/>
-<text x="72" y="56.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">2.1B</text>
-<rect x="102.7" y="293.1" width="49.7" height="74.9" fill="#0B6E4F" rx="2"/>
-<rect x="154.3" y="368.0" width="49.7" height="0.0" fill="#3D5A80" rx="2"/>
-<rect x="206.0" y="241.3" width="49.7" height="126.7" fill="#9B2226" rx="2"/>
-<rect x="257.7" y="66.4" width="49.7" height="301.6" fill="#BB3E03" rx="2"/>
-<text x="206.0" y="390" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#444">10k commits</text>
-<rect x="354.7" y="160.8" width="49.7" height="207.2" fill="#0B6E4F" rx="2"/>
-<rect x="406.3" y="280.6" width="49.7" height="87.4" fill="#3D5A80" rx="2"/>
-<rect x="458.0" y="231.7" width="49.7" height="136.3" fill="#9B2226" rx="2"/>
-<rect x="509.7" y="73.4" width="49.7" height="294.6" fill="#BB3E03" rx="2"/>
-<text x="458.0" y="390" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#444">100k commits</text>
-<rect x="606.7" y="52.0" width="49.7" height="316.0" fill="#0B6E4F" rx="2"/>
-<rect x="658.3" y="176.5" width="49.7" height="191.5" fill="#3D5A80" rx="2"/>
-<rect x="710.0" y="179.4" width="49.7" height="188.6" fill="#9B2226" rx="2"/>
-<rect x="761.7" y="243.0" width="49.7" height="125.0" fill="#BB3E03" rx="2"/>
-<text x="710.0" y="390" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#444">1.0M commits</text>
+<text x="72" y="56.0" text-anchor="end" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">2.6B</text>
+<rect x="102.7" y="211.4" width="49.7" height="140.6" fill="#0B6E4F" rx="2"/>
+<text x="127.5" y="225.4" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">50.7M</text>
+<rect x="154.3" y="258.6" width="49.7" height="93.4" fill="#3D5A80" rx="2"/>
+<text x="179.2" y="272.6" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">15.8M</text>
+<rect x="206.0" y="178.7" width="49.7" height="173.3" fill="#9B2226" rx="2"/>
+<text x="230.8" y="192.7" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">113.4M</text>
+<rect x="257.7" y="68.5" width="49.7" height="283.5" fill="#BB3E03" rx="2"/>
+<text x="282.5" y="82.5" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">1.7B</text>
+<text x="206.0" y="374" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#444">10k commits</text>
+<rect x="354.7" y="128.0" width="49.7" height="224.0" fill="#0B6E4F" rx="2"/>
+<text x="379.5" y="142.0" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">396.0M</text>
+<rect x="406.3" y="203.5" width="49.7" height="148.5" fill="#3D5A80" rx="2"/>
+<text x="431.2" y="217.5" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">61.5M</text>
+<rect x="458.0" y="172.7" width="49.7" height="179.3" fill="#9B2226" rx="2"/>
+<text x="482.8" y="186.7" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">131.5M</text>
+<rect x="509.7" y="72.9" width="49.7" height="279.1" fill="#BB3E03" rx="2"/>
+<text x="534.5" y="86.9" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">1.5B</text>
+<text x="458.0" y="374" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#444">100k commits</text>
+<rect x="606.7" y="59.4" width="49.7" height="292.6" fill="#0B6E4F" rx="2"/>
+<text x="631.5" y="73.4" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">2.1B</text>
+<rect x="658.3" y="137.9" width="49.7" height="214.1" fill="#3D5A80" rx="2"/>
+<text x="683.2" y="151.9" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">310.1M</text>
+<rect x="710.0" y="139.7" width="49.7" height="212.3" fill="#9B2226" rx="2"/>
+<text x="734.8" y="153.7" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">296.5M</text>
+<rect x="761.7" y="179.8" width="49.7" height="172.2" fill="#BB3E03" rx="2"/>
+<text x="786.5" y="193.8" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="10" font-weight="600" fill="#fff">110.4M</text>
+<text x="710.0" y="374" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#444">1.0M commits</text>
 <rect x="80" y="408" width="12" height="12" fill="#0B6E4F" rx="1"/>
 <text x="98" y="418" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#333">epochs</text>
 <rect x="170" y="408" width="12" height="12" fill="#3D5A80" rx="1"/>
