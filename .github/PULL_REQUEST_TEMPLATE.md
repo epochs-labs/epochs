@@ -4,6 +4,12 @@
 
 -
 
+## Related issue
+
+<!-- Required for non-trivial changes. Use a closing keyword so merge closes it. -->
+
+Closes #
+
 ## Test plan
 
 <!-- How should reviewers / CI verify this? Check what applies. -->
