@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Premium SaaS Gradients -->
+    <!-- Main Trunk (Violet to Cyan) -->
+    <linearGradient id="main-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+
+    <!-- Top Branch (Violet to Pink to Cyan) -->
+    <linearGradient id="top-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="50%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+
+    <!-- Bottom Branch (Violet to Blue to Cyan) -->
+    <linearGradient id="bot-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="50%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+
+    <!-- Subtle, professional drop shadow (replaces muddy blur) -->
+    <filter id="crisp-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Fully Transparent Background -->
+  
+  <g transform="translate(0, 0)">
+    
+    <!-- Path Group with subtle depth -->
+    <g filter="url(#crisp-shadow)">
+      
+      <!-- Top Branch: Perfectly tangent S-curve -->
+      <path d="M 100 256 C 178 256, 178 128, 256 128 C 334 128, 334 256, 412 256" 
+            fill="none" 
+            stroke="url(#top-grad)" 
+            stroke-width="20" 
+            stroke-linecap="round" />
+
+      <!-- Bottom Branch: Perfectly tangent S-curve -->
+      <path d="M 100 256 C 178 256, 178 384, 256 384 C 334 384, 334 256, 412 256" 
+            fill="none" 
+            stroke="url(#bot-grad)" 
+            stroke-width="20" 
+            stroke-linecap="round" />
+
+      <!-- Central Trunk: Straight base path -->
+      <path d="M 100 256 L 412 256" 
+            fill="none" 
+            stroke="url(#main-grad)" 
+            stroke-width="20" 
+            stroke-linecap="round" />
+            
+    </g>
+
+    <!-- Crisp State Nodes (Drawn last so they sit cleanly on top) -->
+    <g filter="url(#crisp-shadow)">
+      
+      <!-- Root Node (Violet) -->
+      <circle cx="100" cy="256" r="20" fill="#7C3AED" />
+      <circle cx="100" cy="256" r="8" fill="#FFFFFF" />
+
+      <!-- Top Branch Node (Pink) -->
+      <circle cx="256" cy="128" r="16" fill="#EC4899" />
+      <circle cx="256" cy="128" r="6" fill="#FFFFFF" />
+
+      <!-- Bottom Branch Node (Blue) -->
+      <circle cx="256" cy="384" r="16" fill="#3B82F6" />
+      <circle cx="256" cy="384" r="6" fill="#FFFFFF" />
+
+      <!-- Merge / Tip Node (Cyan) -->
+      <circle cx="412" cy="256" r="20" fill="#06B6D4" />
+      <circle cx="412" cy="256" r="8" fill="#FFFFFF" />
+
+    </g>
+  </g>
+</svg>
