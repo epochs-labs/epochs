@@ -23,3 +23,5 @@ the latest successful `main` baseline. Check the PR coverage comment / job summa
 ## Notes
 
 <!-- Breaking changes, follow-ups, screenshots — optional. -->
+
+<!-- coverage CI smoke -->
