@@ -15,7 +15,7 @@ platforms) sit above it:
 
 ```
 product SDK / UI          →  domain types (agents, threads, …)
-epochs-server (future)    →  auth, workspaces, multi-tenant
+epochs-server (EPX)       →  auth, workspaces, multi-tenant
 epochs-core + epochql     →  collections, HAMT docs, DAG commits, path indexes
 ```
 
@@ -40,6 +40,7 @@ Append-only CAS (.epl / .epi) — std::fs + blake3
 | [`epochs-core`](epochs-core) | CAS, HAMT, commits (`index_roots`), `DiskStore` |
 | [`epochql`](epochql) | Lexer, parser, executor, **`.eql` migrations + path indexes** |
 | [`epochs-cli`](epochs-cli) | `init`, `commit`, `branch`, `checkout`, `migrate`, `query` |
+| [`epochs-server`](epochs-server) | Epoch Protocol (EPX) TCP server (`epochs://host:7420`) |
 | [`epochs-bench`](epochs-bench) | Fair Docker deep-history benches — [`benches/`](benches/) |
 
 ## What works today
@@ -53,10 +54,11 @@ Append-only CAS (.epl / .epi) — std::fs + blake3
 | `.eql` migrations + path indexes | Done |
 | CLI (`epochs`) | Done |
 | Fair Docker benchmarks (deep history) | Done |
+| Epoch Protocol server (EPX TCP) | Done (single-writer) |
 | Tags (`TAG …`) | **Not implemented** (parsed / rejected) |
 | `MERGE … STRATEGY THREE_WAY` / `SQUASH` | **Not implemented** (FF only) |
 | Proly trees (CDC / range) | Design only — [`epochs-core/docs/proly-v1.md`](epochs-core/docs/proly-v1.md) |
-| Multi-writer / network sync / server | **Future** |
+| Multi-writer / network sync | **Future** |
 | Pack / GC / io_uring | **Future** |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to hack on the project.

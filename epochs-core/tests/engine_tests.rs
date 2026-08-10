@@ -275,3 +275,19 @@ fn dag_topology_multi_branch() {
 
     std::fs::remove_dir_all(&dir).ok();
 }
+
+#[test]
+fn disk_get_object_returns_commit_payload() {
+    let dir = temp_repo(&format!("epochs_get_object_{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+
+    let (mut store, root) = DiskStore::init(&dir, "main", "genesis").expect("init");
+    let (ty, payload) = store.get_object(&root).expect("get_object");
+    assert_eq!(ty, epochs_core::RecordType::Commit);
+    assert!(!payload.is_empty());
+
+    let missing = Hash::from_hex(&"ab".repeat(32)).expect("hash");
+    assert!(store.get_object(&missing).is_err());
+
+    std::fs::remove_dir_all(&dir).ok();
+}

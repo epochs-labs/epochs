@@ -15,7 +15,9 @@ cargo test --workspace
 ```
 
 3. Keep diffs focused. Prefer small PRs over large refactors.
-4. Do not commit secrets, local `target/`, or `benches/out/` scratch files.
+4. **Tests required** for new or changed behavior (`cargo test --workspace`
+   must cover it — unit and/or integration). Do not land features without tests.
+5. Do not commit secrets, local `target/`, or `benches/out/` scratch files.
    Published bench charts/CSV under `benches/charts/` and `benches/RESULTS.md`
    are fine when regenerating intentionally.
 
@@ -26,10 +28,12 @@ cargo test --workspace
 | `epochs-core` | Storage engine (CAS, HAMT, commits) — keep **domain-free** |
 | `epochql` | Query language + migrations |
 | `epochs-cli` | Developer CLI |
+| `epochs-server` | Epoch Protocol (EPX) TCP server |
 | `epochs-bench` | Fair Docker benchmarks only |
 
-Agent product / server / SaaS concerns belong **outside** this repo unless
-they are thin examples.
+Agent product / SaaS concerns belong **outside** this repo unless they are thin
+examples. Server protocol and auth-shaped plumbing may live in `epochs-server`.
+
 
 ## License
 

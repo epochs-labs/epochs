@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render scale-ladder SVG charts from epochs-bench CSV (stdlib only)."""
+"""Render ClickBench-style grouped bar charts from epochs-bench CSV (stdlib only)."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
+ENGINES = ["epochs", "sqlite", "postgres", "mysql"]
 COLORS = {
     "epochs": "#0B6E4F",
     "sqlite": "#3D5A80",
@@ -17,11 +18,11 @@ COLORS = {
 
 
 def parse_rows(path: Path) -> list[dict]:
-    rows = []
     text = path.read_text().strip()
     if not text:
-        return rows
+        return []
     header = None
+    rows = []
     for line in text.splitlines():
         if line.startswith("engine,"):
             header = line.split(",")
@@ -33,9 +34,8 @@ def parse_rows(path: Path) -> list[dict]:
             continue
         row = dict(zip(header, parts))
         try:
-            # new schema
-            if "live_keys" in row:
-                row["live_keys"] = int(float(row["live_keys"]))
+            if row.get("shape", "deep") not in ("deep", ""):
+                continue
             row["commits"] = int(float(row["commits"]))
             row["commit_per_s"] = float(row["commit_per_s"])
             row["w1_p50_us"] = float(row["w1_p50_us"])
@@ -43,11 +43,7 @@ def parse_rows(path: Path) -> list[dict]:
             row["r2_p50_us"] = float(row["r2_p50_us"])
             row["disk_bytes"] = float(row.get("disk_bytes") or 0)
             row["rss_bytes"] = float(row.get("rss_bytes") or 0)
-            row.setdefault("shape", "deep")
         except ValueError:
-            continue
-        # Prefer deep shape for published charts
-        if row.get("shape", "deep") not in ("deep", ""):
             continue
         rows.append(row)
     latest: dict[tuple, dict] = {}
@@ -58,98 +54,141 @@ def parse_rows(path: Path) -> list[dict]:
 
 def nice_num(x: float) -> str:
     if x >= 1e9:
-        return f"{x/1e9:.1f}B"
+        return f"{x / 1e9:.1f}B"
     if x >= 1e6:
-        return f"{x/1e6:.1f}M"
+        return f"{x / 1e6:.1f}M"
     if x >= 1e3:
-        return f"{x/1e3:.0f}k"
-    return f"{x:.0f}"
+        return f"{x / 1e3:.0f}k"
+    if x >= 10:
+        return f"{x:.0f}"
+    return f"{x:.1f}"
 
 
-def svg_line_chart(
+def fmt_latency_us(us: float) -> str:
+    if us >= 1_000_000:
+        return f"{us / 1_000_000:.1f}s"
+    if us >= 1000:
+        return f"{us / 1000:.1f}ms"
+    return f"{us:.0f}µs"
+
+
+def svg_grouped_bars(
     title: str,
-    series: dict[str, list[tuple[float, float]]],
     ylab: str,
-    log_y: bool = True,
-    width: int = 720,
-    height: int = 420,
+    groups: list[str],
+    series: dict[str, list[float]],
+    *,
+    log_y: bool = False,
+    value_fmt=None,
+    width: int = 860,
+    height: int = 440,
 ) -> str:
-    pad_l, pad_r, pad_t, pad_b = 72, 24, 48, 56
+    """groups = x labels (e.g. commit counts); series[engine] = values aligned to groups."""
+    pad_l, pad_r, pad_t, pad_b = 80, 24, 52, 72
     plot_w = width - pad_l - pad_r
     plot_h = height - pad_t - pad_b
 
-    xs = [p[0] for pts in series.values() for p in pts]
-    ys = [p[1] for pts in series.values() for p in pts if p[1] > 0]
-    if not xs or not ys:
+    engines = [e for e in ENGINES if e in series and any(v > 0 for v in series[e])]
+    if not groups or not engines:
         return (
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">'
-            f'<text x="20" y="40" font-family="sans-serif">no data yet — run ./benches/run-ladder.sh</text></svg>'
+            f'<text x="24" y="40" font-family="sans-serif">no data</text></svg>'
         )
 
-    xmin, xmax = min(xs), max(xs)
-    ymin, ymax = min(ys), max(ys)
+    vals = [v for e in engines for v in series[e] if v > 0]
+    ymin = min(vals) if log_y else 0.0
+    ymax = max(vals)
     if log_y:
         ymin = max(ymin, 1e-9)
         ymax = max(ymax, ymin * 10)
-
-    def xmap(x: float) -> float:
-        if xmax == xmin:
-            return pad_l + plot_w / 2
-        lx0, lx1 = math.log10(max(xmin, 1)), math.log10(max(xmax, 1))
-        return pad_l + (math.log10(max(x, 1)) - lx0) / (lx1 - lx0) * plot_w
+    else:
+        ymax = ymax * 1.15 if ymax > 0 else 1.0
 
     def ymap(y: float) -> float:
         if log_y:
-            ly0, ly1 = math.log10(ymin), math.log10(ymax)
-            t = (math.log10(max(y, ymin)) - ly0) / (ly1 - ly0)
+            t = (math.log10(max(y, ymin)) - math.log10(ymin)) / (
+                math.log10(ymax) - math.log10(ymin)
+            )
         else:
-            t = (y - ymin) / (ymax - ymin) if ymax != ymin else 0.5
+            t = y / ymax if ymax else 0.0
         return pad_t + plot_h * (1 - t)
 
+    n_groups = len(groups)
+    n_eng = len(engines)
+    cluster = plot_w / n_groups
+    gap = cluster * 0.18
+    usable = cluster - gap
+    bar_w = usable / n_eng
+
+    font = "IBM Plex Sans, Helvetica, Arial, sans-serif"
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="#FAFAF8"/>',
-        f'<text x="{pad_l}" y="28" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#1a1a1a">{title}</text>',
-        f'<text x="16" y="{pad_t + plot_h/2}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#555" transform="rotate(-90 16,{pad_t + plot_h/2})">{ylab}</text>',
-        f'<text x="{pad_l + plot_w/2}" y="{height - 12}" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#555">commits (log) — deep shape</text>',
-        f'<rect x="{pad_l}" y="{pad_t}" width="{plot_w}" height="{plot_h}" fill="none" stroke="#ddd"/>',
+        f'<text x="{pad_l}" y="30" font-family="{font}" font-size="18" font-weight="600" fill="#1a1a1a">{title}</text>',
+        f'<text x="18" y="{pad_t + plot_h / 2}" font-family="{font}" font-size="12" fill="#555" '
+        f'transform="rotate(-90 18,{pad_t + plot_h / 2})">{ylab}</text>',
+        f'<rect x="{pad_l}" y="{pad_t}" width="{plot_w}" height="{plot_h}" fill="#fff" stroke="#e5e5e5"/>',
     ]
 
-    for c in sorted({p[0] for pts in series.values() for p in pts}):
-        x = xmap(c)
-        parts.append(f'<line x1="{x:.1f}" y1="{pad_t}" x2="{x:.1f}" y2="{pad_t+plot_h}" stroke="#eee"/>')
+    # horizontal grid
+    for i in range(5):
+        frac = i / 4
+        if log_y:
+            gy = ymin * (ymax / ymin) ** frac
+        else:
+            gy = ymax * frac
+        y = ymap(gy)
         parts.append(
-            f'<text x="{x:.1f}" y="{pad_t+plot_h+18}" text-anchor="middle" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="11" fill="#666">{nice_num(c)}</text>'
+            f'<line x1="{pad_l}" y1="{y:.1f}" x2="{pad_l + plot_w}" y2="{y:.1f}" stroke="#eee"/>'
+        )
+        label = value_fmt(gy) if value_fmt else nice_num(gy)
+        parts.append(
+            f'<text x="{pad_l - 8}" y="{y + 4:.1f}" text-anchor="end" font-family="{font}" '
+            f'font-size="11" fill="#666">{label}</text>'
         )
 
-    legend_x, legend_y = pad_l + 8, pad_t + 16
-    for eng, pts in sorted(series.items()):
-        pts = sorted(pts)
-        if not pts:
-            continue
-        color = COLORS.get(eng, "#333")
-        d = "M " + " L ".join(f"{xmap(x):.1f},{ymap(y):.1f}" for x, y in pts)
-        parts.append(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="2.5"/>')
-        for x, y in pts:
-            parts.append(f'<circle cx="{xmap(x):.1f}" cy="{ymap(y):.1f}" r="3.5" fill="{color}"/>')
+    baseline = pad_t + plot_h
+    for gi, gname in enumerate(groups):
+        cx = pad_l + gi * cluster + gap / 2
+        for ei, eng in enumerate(engines):
+            v = series[eng][gi] if gi < len(series[eng]) else 0.0
+            if v <= 0:
+                continue
+            x = cx + ei * bar_w
+            y = ymap(v)
+            h = baseline - y
+            color = COLORS.get(eng, "#333")
+            parts.append(
+                f'<rect x="{x:.1f}" y="{y:.1f}" width="{max(bar_w - 2, 1):.1f}" height="{h:.1f}" '
+                f'fill="{color}" rx="2"/>'
+            )
         parts.append(
-            f'<rect x="{legend_x}" y="{legend_y-8}" width="12" height="12" fill="{color}"/>'
-            f'<text x="{legend_x+18}" y="{legend_y+2}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#333">{eng}</text>'
+            f'<text x="{cx + usable / 2:.1f}" y="{baseline + 22}" text-anchor="middle" '
+            f'font-family="{font}" font-size="12" fill="#444">{gname}</text>'
         )
-        legend_y += 18
+
+    # legend
+    lx, ly = pad_l, height - 22
+    for eng in engines:
+        color = COLORS[eng]
+        parts.append(f'<rect x="{lx}" y="{ly - 10}" width="12" height="12" fill="{color}" rx="1"/>')
+        parts.append(
+            f'<text x="{lx + 18}" y="{ly}" font-family="{font}" font-size="12" fill="#333">{eng}</text>'
+        )
+        lx += 90
 
     parts.append("</svg>")
     return "\n".join(parts)
 
 
-def build_series(rows: list[dict], field: str) -> dict[str, list[tuple[float, float]]]:
-    out: dict[str, list[tuple[float, float]]] = defaultdict(list)
-    for r in rows:
-        v = r[field]
-        if v <= 0:
-            continue
-        out[r["engine"]].append((float(r["commits"]), float(v)))
-    return out
+def build_grouped(rows: list[dict], field: str) -> tuple[list[str], dict[str, list[float]]]:
+    commits = sorted({r["commits"] for r in rows})
+    by = {(r["engine"], r["commits"]): r[field] for r in rows}
+    groups = [nice_num(c) + " commits" for c in commits]
+    series: dict[str, list[float]] = {}
+    for eng in ENGINES:
+        series[eng] = [float(by.get((eng, c), 0.0)) for c in commits]
+    return groups, series
 
 
 def main() -> None:
@@ -162,15 +201,59 @@ def main() -> None:
     rows = parse_rows(Path(args.csv))
 
     charts = [
-        ("commit_throughput.svg", "Commit throughput vs history depth", "commit_per_s", "commits / s"),
-        ("w1_latency.svg", "W1 commit latency (p50) vs history depth", "w1_p50_us", "p50 µs"),
-        ("r1_history.svg", "R1 history walk (p50) — should stay flat", "r1_p50_us", "p50 µs"),
-        ("r2_checkout.svg", "R2 tip checkout (p50) — SQL replay vs HAMT", "r2_p50_us", "p50 µs"),
-        ("disk.svg", "Disk footprint vs history depth", "disk_bytes", "bytes"),
-        ("memory.svg", "Memory (cgroup) vs history depth", "rss_bytes", "bytes"),
+        (
+            "commit_throughput.svg",
+            "Commit throughput (higher is better)",
+            "commits / s",
+            "commit_per_s",
+            False,
+            nice_num,
+        ),
+        (
+            "w1_latency.svg",
+            "W1 commit latency p50 (lower is better)",
+            "p50",
+            "w1_p50_us",
+            True,
+            fmt_latency_us,
+        ),
+        (
+            "r1_history.svg",
+            "R1 history walk p50 — should stay flat",
+            "p50",
+            "r1_p50_us",
+            True,
+            fmt_latency_us,
+        ),
+        (
+            "r2_checkout.svg",
+            "R2 tip checkout p50 — HAMT vs SQL replay",
+            "p50",
+            "r2_p50_us",
+            True,
+            fmt_latency_us,
+        ),
+        (
+            "disk.svg",
+            "Disk footprint",
+            "bytes",
+            "disk_bytes",
+            True,
+            nice_num,
+        ),
+        (
+            "memory.svg",
+            "Memory (cgroup RSS)",
+            "bytes",
+            "rss_bytes",
+            True,
+            nice_num,
+        ),
     ]
-    for fname, title, field, ylab in charts:
-        svg = svg_line_chart(title, build_series(rows, field), ylab, log_y=True)
+
+    for fname, title, ylab, field, log_y, fmt in charts:
+        groups, series = build_grouped(rows, field)
+        svg = svg_grouped_bars(title, ylab, groups, series, log_y=log_y, value_fmt=fmt)
         (out / fname).write_text(svg)
         print(f"wrote {out / fname}")
 

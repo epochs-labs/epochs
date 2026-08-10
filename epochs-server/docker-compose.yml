@@ -1,0 +1,17 @@
+# epochs-server — Epoch Protocol EPX (:7420)
+services:
+  epochs:
+    build:
+      context: ..
+      dockerfile: epochs-server/Dockerfile
+    image: epochs-server:local
+    ports:
+      - "7420:7420"
+    volumes:
+      - epochs-data:/data
+    environment:
+      EPOCHS_DATA: /data
+      EPOCHS_BIND: 0.0.0.0:7420
+
+volumes:
+  epochs-data:

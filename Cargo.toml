@@ -1,5 +1,5 @@
 [workspace]
-members = ["epochs-core", "epochql", "epochs-cli", "epochs-bench"]
+members = ["epochs-core", "epochql", "epochs-cli", "epochs-bench", "epochs-server"]
 resolver = "2"
 
 [workspace.package]
@@ -19,4 +19,7 @@ blake3 = "1"
 dashmap = "6"
 arc-swap = "1"
 serde_json = "1"
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4", features = ["derive", "env"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal", "io-util", "sync", "time"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

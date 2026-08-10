@@ -68,6 +68,14 @@ impl DiskStore {
         Ok(())
     }
 
+    /// Fetch a raw CAS object by content hash (type + payload).
+    pub fn get_object(
+        &mut self,
+        hash: &Hash,
+    ) -> Result<(crate::cas::RecordType, std::sync::Arc<[u8]>)> {
+        self.cas.get_payload(hash)
+    }
+
     /// Repository root path (where `migrations/`, `schema.state`, and CAS live).
     pub fn path(&self) -> &std::path::Path {
         self.repo.path()
