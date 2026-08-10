@@ -1,9 +1,21 @@
-# epochs
+<p align="center">
+  <img src="assets/logo.svg" alt="epochs" width="160" height="160" />
+</p>
 
-A version-controlled Merkle-DAG database engine — git-like storage for mutable
-state. Branch, merge, and time-travel through data. Written in Rust.
+<h1 align="center">epochs</h1>
 
-[![CI](https://github.com/epochs-labs/epochs/actions/workflows/ci.yml/badge.svg)](https://github.com/epochs-labs/epochs/actions/workflows/ci.yml)
+<p align="center">
+  <em>Merkle-DAG database — branch, merge, and time-travel through data. Fast to embed, ready for history.</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/epochs-labs/epochs/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/epochs-labs/epochs/ci.yml?branch=main&style=flat-square&label=CI" alt="CI" /></a>
+  <a href="https://github.com/epochs-labs/epochs/blob/main/.github/coverage-floor"><img src="https://img.shields.io/badge/coverage-%E2%89%A568%25-brightgreen?style=flat-square&label=coverage" alt="Coverage floor" /></a>
+  <a href="https://github.com/epochs-labs/epochs/releases"><img src="https://img.shields.io/github/v/release/epochs-labs/epochs?style=flat-square&label=release" alt="Release" /></a>
+  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/rust-edition%202021-orange?style=flat-square" alt="Rust edition 2021" /></a>
+  <a href="LICENSE-MIT"><img src="https://img.shields.io/badge/license-MIT%2FApache--2.0-blue?style=flat-square" alt="License" /></a>
+  <a href="https://github.com/epochs-labs/epochs/stargazers"><img src="https://img.shields.io/github/stars/epochs-labs/epochs?style=flat-square" alt="Stars" /></a>
+</p>
 
 > **Status: early public 0.1.x.** Useful as a local engine and query language.
 > APIs and EpochQL may break without a major version bump until **1.0**.
