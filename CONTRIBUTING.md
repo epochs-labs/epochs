@@ -3,10 +3,24 @@
 Thanks for your interest. This project is an early **0.1.x** Merkle-DAG database
 engine — expect breaking API changes until 1.0.
 
+## Workflow (issue → PR)
+
+For **non-trivial** changes (features, protocol/API work, multi-crate refactors,
+process/CI beyond a one-liner):
+
+1. **Open an issue first** using a [template](https://github.com/epochs-labs/epochs/issues/new/choose).
+   Include problem, proposal, acceptance criteria, and non-goals.
+2. Discuss / refine on the issue if needed.
+3. Open a **PR that closes the issue** — put `Closes #N` in the PR body
+   ([`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md)).
+
+Small typos, trivial docs, and obvious one-line fixes can skip an issue.
+
 ## Before you open a PR
 
 1. Read the [README](README.md) status table (what works vs roadmap).
-2. Run locally:
+2. Link the issue (`Closes #N`) unless the change is trivial.
+3. Run locally:
 
 ```bash
 cargo fmt --all
@@ -14,16 +28,15 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-3. Keep diffs focused. Prefer small PRs over large refactors.
-4. **Tests required** for new or changed behavior (`cargo test --workspace`
+4. Keep diffs focused. Prefer small PRs over large refactors.
+5. **Tests required** for new or changed behavior (`cargo test --workspace`
    must cover it — unit and/or integration). Do not land features without tests.
-5. Pull requests use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
-   CI runs fmt/clippy/tests **and** coverage via **`cargo llvm-cov`** (LLVM’s
-   coverage instrumentation — no Codecov/Coveralls). The coverage job:
+6. CI runs fmt/clippy/tests **and** coverage via **`cargo llvm-cov`**. The
+   coverage job:
    - fails under [`.github/coverage-floor`](.github/coverage-floor)
    - fails if line coverage drops **>1pp** vs the latest successful `main` artifact
    - posts a sticky PR comment + Actions job summary
-6. Do not commit secrets, local `target/`, or `benches/out/` scratch files.
+7. Do not commit secrets, local `target/`, or `benches/out/` scratch files.
    Published bench charts/CSV under `benches/charts/` and `benches/RESULTS.md`
    are fine when regenerating intentionally.
 

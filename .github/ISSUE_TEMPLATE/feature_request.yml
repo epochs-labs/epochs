@@ -1,11 +1,12 @@
-name: Feature request
-description: Propose a capability or API change
+name: Feature / change proposal
+description: Propose a capability or non-trivial change (open before the PR)
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Check the README roadmap first (Proly, server, THREE_WAY merge, etc.).
+        **Bigger changes should be an issue first**, then a PR that `Closes #N`.
+        Check the README roadmap (Proly, merge strategies, client/pool, etc.).
   - type: textarea
     id: problem
     attributes:
@@ -17,7 +18,24 @@ body:
     id: proposal
     attributes:
       label: Proposal
-      description: Sketch of API / behavior (optional but helpful)
+      description: Sketch of API / behavior / approach
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How do we know this is done?
+      placeholder: |
+        - [ ] …
+        - [ ] Tests cover …
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals / out of scope
+      description: What this issue deliberately will not do
   - type: dropdown
     id: area
     attributes:
@@ -26,7 +44,10 @@ body:
         - epochs-core
         - epochql
         - epochs-cli
+        - epochs-server / EPX
+        - epochs-client (future)
         - epochs-bench / docs
+        - CI / process
         - unsure
     validations:
       required: true
