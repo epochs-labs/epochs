@@ -4,7 +4,6 @@ A version-controlled Merkle-DAG database engine — git-like storage for mutable
 state. Branch, merge, and time-travel through data. Written in Rust.
 
 [![CI](https://github.com/epochs-labs/epochs/actions/workflows/ci.yml/badge.svg)](https://github.com/epochs-labs/epochs/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/epochs-labs/epochs/branch/main/graph/badge.svg)](https://codecov.io/gh/epochs-labs/epochs)
 
 > **Status: early public 0.1.x.** Useful as a local engine and query language.
 > APIs and EpochQL may break without a major version bump until **1.0**.

@@ -16,9 +16,9 @@
 
 ## Coverage
 
-CI uploads coverage to Codecov and fails the **coverage** check if project
-coverage drops materially or the patch is under-tested. Glance at the Codecov
-comment / check on this PR before merge.
+CI runs `cargo llvm-cov` (no third-party coverage SaaS). The **coverage** job
+fails if line coverage drops below `.github/coverage-floor` or more than 1pp vs
+the latest successful `main` baseline. Check the PR coverage comment / job summary.
 
 ## Notes
 

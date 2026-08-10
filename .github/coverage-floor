@@ -1,0 +1,3 @@
+# Absolute minimum line coverage (%) from `cargo llvm-cov` TOTAL.
+# Raise this when coverage improves; never lower without an explicit decision.
+68.0

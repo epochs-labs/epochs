@@ -36,9 +36,9 @@ jobs:
   coverage:
     name: coverage
     runs-on: ubuntu-latest
-    # Codecov PR comments / checks need this on the base workflow.
     permissions:
       contents: read
+      actions: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
@@ -61,41 +61,120 @@ jobs:
         run: |
           cargo llvm-cov --workspace --locked \
             --exclude epochs-bench \
-            --codecov --output-path codecov.json
+            --lcov --output-path lcov.info
           cargo llvm-cov report --summary-only | tee coverage-summary.txt
+
+      - name: Fetch main baseline
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p baseline
+          set +e
+          for RUN_ID in $(gh run list \
+            --repo "${{ github.repository }}" \
+            --branch main \
+            --workflow CI \
+            --status success \
+            --limit 30 \
+            --json databaseId \
+            --jq '.[].databaseId'); do
+            if gh run download "$RUN_ID" \
+              --repo "${{ github.repository }}" \
+              -n coverage-baseline \
+              -D baseline 2>/dev/null; then
+              echo "Downloaded baseline from run $RUN_ID"
+              break
+            fi
+          done
+          if [ ! -f baseline/coverage.json ]; then
+            echo "No coverage-baseline artifact on recent main runs yet"
+          fi
+          set -e
+
+      - name: Gate coverage
+        id: gate
+        run: |
+          BASELINE_ARGS=()
+          if [ -f baseline/coverage.json ]; then
+            BASELINE_ARGS=(--baseline-json baseline/coverage.json)
+          fi
+          python3 .github/scripts/coverage_gate.py \
+            --summary coverage-summary.txt \
+            --out-json coverage.json \
+            --floor-file .github/coverage-floor \
+            --max-drop 1.0 \
+            --commit "${{ github.sha }}" \
+            "${BASELINE_ARGS[@]}"
+          echo "percent=$(python3 -c 'import json; print(json.load(open("coverage.json"))["line_percent"])')" >> "$GITHUB_OUTPUT"
 
       - name: Job summary
         if: always()
         run: |
           {
-            echo "## Test coverage"
+            echo "## Test coverage (cargo-llvm-cov)"
             echo
             if [ -f coverage-summary.txt ]; then
               echo '```'
               cat coverage-summary.txt
               echo '```'
-            else
-              echo "_Coverage summary unavailable (see job logs)._"
             fi
             echo
-            echo "Full report uploads to [Codecov](https://app.codecov.io/gh/epochs-labs/epochs)."
-            echo "Project/patch status is enforced via \`codecov.yml\` (fail on material drop)."
+            if [ -f coverage.json ]; then
+              echo "Parsed line coverage: **$(python3 -c 'import json; print(json.load(open("coverage.json"))["line_percent"])')%**"
+            fi
+            echo
+            echo "Floor: \`.github/coverage-floor\` · PRs may not drop >1pp vs latest \`main\` baseline artifact."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload Codecov report artifact
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -f coverage.json ]; then
+            echo "No coverage.json; skip comment"
+            exit 0
+          fi
+          PCT=$(python3 -c 'import json; print(json.load(open("coverage.json"))["line_percent"])')
+          FLOOR=$(awk 'NF{print $1; exit}' .github/coverage-floor)
+          if [ -f baseline/coverage.json ]; then
+            BASE=$(python3 -c 'import json; print(json.load(open("baseline/coverage.json"))["line_percent"])')
+            DELTA=$(python3 -c "print(round($PCT - $BASE, 2))")
+            BASE_LINE="| vs \`main\` | ${BASE}% → **${PCT}%** (Δ ${DELTA}pp) |"
+          else
+            BASE_LINE="| vs \`main\` | _(no baseline artifact yet — next main push establishes one)_ |"
+          fi
+          BODY=$(cat <<EOF
+          <!-- epochs-coverage -->
+          ## Coverage report
+
+          | | |
+          |--|--|
+          | **Line coverage** | **${PCT}%** |
+          | Floor | ${FLOOR}% |
+          ${BASE_LINE}
+
+          Source: \`cargo llvm-cov\` (LLVM instrumentation). Full table is in the **coverage** job summary.
+          EOF
+          )
+          BODY=$(printf '%s\n' "$BODY" | sed 's/^          //')
+          MARKER="<!-- epochs-coverage -->"
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq ".[] | select(.body | contains(\"$MARKER\")) | .id" | head -n 1)
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/${COMMENT_ID}" -f body="$BODY"
+          else
+            gh pr comment "${{ github.event.pull_request.number }}" --body "$BODY"
+          fi
+
+      - name: Upload coverage artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: codecov-json
-          path: codecov.json
+          name: coverage-baseline
+          path: |
+            coverage.json
+            coverage-summary.txt
+            lcov.info
           if-no-files-found: ignore
-
-      - name: Upload to Codecov
-        if: always()
-        uses: codecov/codecov-action@v5
-        with:
-          files: codecov.json
-          # Prefer secret when set; public repos can also use the Codecov GitHub App.
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false
-          verbose: true
