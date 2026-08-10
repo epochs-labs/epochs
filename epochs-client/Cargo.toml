@@ -1,0 +1,23 @@
+[package]
+name = "epochs-client"
+description = "Async Epoch Protocol (EPX) client for epochs-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+authors.workspace = true
+keywords = ["database", "merkle", "dag", "client", "epx"]
+categories = ["database", "network-programming", "asynchronous"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+base64 = "0.22"
+
+[dev-dependencies]
+epochs-server = { path = "../epochs-server", version = "0.1.0" }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "net", "io-util", "sync", "time"] }

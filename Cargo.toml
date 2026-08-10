@@ -1,5 +1,5 @@
 [workspace]
-members = ["epochs-core", "epochql", "epochs-cli", "epochs-bench", "epochs-server"]
+members = ["epochs-core", "epochql", "epochs-cli", "epochs-bench", "epochs-server", "epochs-client"]
 resolver = "2"
 
 [workspace.package]

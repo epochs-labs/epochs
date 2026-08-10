@@ -63,6 +63,7 @@ Require these checks on `main`:
 | `epochql` | Query language + migrations |
 | `epochs-cli` | Developer CLI |
 | `epochs-server` | Epoch Protocol (EPX) TCP server |
+| `epochs-client` | Async EPX client + pool |
 | `epochs-bench` | Fair Docker benchmarks only |
 
 Agent product / SaaS concerns belong **outside** this repo unless they are thin

@@ -55,6 +55,7 @@ Append-only CAS (.epl / .epi) — std::fs + blake3
 | [`epochql`](epochql) | Lexer, parser, executor, **`.eql` migrations + path indexes** |
 | [`epochs-cli`](epochs-cli) | `init`, `commit`, `branch`, `checkout`, `migrate`, `query` |
 | [`epochs-server`](epochs-server) | Epoch Protocol (EPX) TCP server (`epochs://host:7420`) |
+| [`epochs-client`](epochs-client) | Async EPX client + connection pool |
 | [`epochs-bench`](epochs-bench) | Fair Docker deep-history benches — [`benches/`](benches/) |
 
 ## What works today
@@ -69,6 +70,7 @@ Append-only CAS (.epl / .epi) — std::fs + blake3
 | CLI (`epochs`) | Done |
 | Fair Docker benchmarks (deep history) | Done |
 | Epoch Protocol server (EPX TCP) | Done (single-writer) |
+| EPX client + pool (`epochs-client`) | Done |
 | Tags (`TAG …`) | **Not implemented** (parsed / rejected) |
 | `MERGE … STRATEGY THREE_WAY` / `SQUASH` | **Not implemented** (FF only) |
 | Proly trees (CDC / range) | Design only — [`epochs-core/docs/proly-v1.md`](epochs-core/docs/proly-v1.md) |
